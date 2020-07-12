@@ -5,19 +5,24 @@ var passport = require('passport');
 var logger = require('morgan');
 var session = require('express-session');
 var expressValidator = require('express-validator');
-
 var mainRouter = require('./routes/main');
 let usuario = require('./models/usuario');
-
 var app = express();
-
-
 
 app.use(logger('dev')); //  formato_ Concise output colored by response status for development use.
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.use(function(req,res,next){
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods','GET, POST, PUT, DELETE');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  next();
+})
+
 
 app.use(session({
   secret: 'secrettexthere',

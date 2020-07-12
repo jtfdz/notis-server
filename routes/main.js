@@ -1,8 +1,6 @@
 var express = require('express');
 var router = express.Router();
-
 let passport = require('passport')
-
 let auth = require('../controllers/Authentication');
 let sessionHelper = require('../models/session');
 let user = require('../models/usuario');
@@ -14,48 +12,54 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
-router.post('/login', check('contraseña').not().isEmpty(), check('alias').not().isEmpty(), auth.isLogged, passport.authenticate('local'), function(req, res){
-    const errors = validationResult(req)
-    if (!errors.isEmpty()) {
-        return res.status(422).json({ errors: errors.array() })
-    }
+router.post('/login', auth.isLogged, passport.authenticate('local'), function(req, res){
     res.json({mensaje: "Logged in con éxito.", status: 200})
-})
+});
 
 router.get('/logout', auth.isAuth, function(req, res){
         req.logout();
         res.json({mensaje: "Logged out con éxito.", status: 200})
 })
 
-router.post('/registrar', check('nombre').isLength({min: 3}), check('contraseña').isLength({min: 3}),
-check('alias').isLength({min: 3}), check('correo').isLength({min: 3}), check('descripcion').isLength({min: 3}),
-
-check('correo').custom(value => { return user.checkingEmail(value).then(user =>{if(user){ return Promise.reject('Correo en existencia.'); } } )}),
-check('alias').custom(value => { return user.getUserByUsername(value).then(user =>{if(user){ return Promise.reject('Alias en existencia. Intente con un alias diferente.'); } } )}),
-
-check('correo').isEmail(), auth.isLogged, function(req, res){
+router.post('/registro', 
+    check('email').custom(value => { return user.checkingEmail(value).then(user =>{if(user){ return Promise.reject('Correo en existencia.'); } } )}),
+    check('username').custom(value => { return user.getUserByUsername(value).then(user =>{if(user){ return Promise.reject('Nombre de usuario en existencia. Intente con uno diferente.'); } } )}),
+    auth.isLogged, function(req, res){
 
     const errors = validationResult(req)
       if (!errors.isEmpty()) {
-        return res.status(422).json({ errors: errors.array() })
+        return res.status(422).json({ errors: errors.array()  })
       }
 
     user.registrarUsuario(req.body).then((result)=>{
         let count = result.rowCount;
         let status, mensaje;
         if(count > 0){
-        status = 200;
-        mensaje = "Usuario Registrado.";
+            status = 200;
+            mensaje = "Usuario Registrado.";
         }else{
-      status = 500;
-      mensaje = 'Error al registrar Usuario.'
-      }
+          status = 500;
+          mensaje = 'Error al registrar Usuario.'
+          }
       res.json({status, mensaje})
       }).catch(err => {
-    console.log(err);
-    res.status(500).json({status: 500, mensaje: 'Error al Registrar.'});
-    }) 
-})
+        console.log(err);
+        res.status(500).json({status: 500, mensaje: 'Error al Registrar.'});
+        }) 
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 router.get('/pagina', auth.isAuth, (req, res) => {
     user.Despliegue(sessionHelper.getIdFromSession(req)).then((data) => {
