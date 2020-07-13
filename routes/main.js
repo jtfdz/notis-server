@@ -17,8 +17,8 @@ router.post('/login', auth.isLogged, passport.authenticate('local'), function(re
 });
 
 router.get('/logout', auth.isAuth, function(req, res){
-        req.logout();
-        res.json({mensaje: "Logged out con éxito.", status: 200})
+    req.logout();
+    res.json({mensaje: "Logged out con éxito.", status: 200})
 })
 
 router.post('/registro', 
