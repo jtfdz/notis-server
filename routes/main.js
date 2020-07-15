@@ -7,7 +7,6 @@ let user = require('../models/usuario');
 
 const { check, validationResult } = require('express-validator');
 
-
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
@@ -49,6 +48,52 @@ router.post('/registro',
 });
 
 
+router.post('/nota/crear', auth.isAuth, (req, res) => {
+    user.notaCrear(req.body, sessionHelper.getIdFromSession(req)).then((result) => {
+        res.json({status: 200, message: 'Nota creada.'})
+    }).catch(err => {
+        console.log(err)
+        res.json({status: 500, message: 'Error al crear nota.'})
+    })
+})
+
+router.get('/estadisticas', auth.isAuth, (req, res) => {
+    user.estadisticas(sessionHelper.getIdFromSession(req)).then((data) => {
+        let message, status;
+        if(data !== null){
+            message = "estadísticas desplegadas :).";
+            status = 200;
+        }else{
+            message = "estadísticas NO desplegadas :(.",
+            status = 404;
+        }
+        res.json({data, message, status});
+    }).catch(err => {
+        console.log(err)
+        res.json({status: 500, message: 'Error al enviar estadísticas.'})
+    })
+})
+
+
+router.get('/notas', auth.isAuth, (req, res) => {
+    user.notasMostrar(sessionHelper.getIdFromSession(req)).then((data) => {
+        let message, status;
+        if(data !== null){
+            message = "notas desplegadas :).";
+            status = 200;
+        }else{
+            message = "notas NO desplegadas :(.",
+            status = 404;
+        }
+        res.json({data, message, status});
+    }).catch(err => {
+        console.log(err)
+        res.json({status: 500, message: 'Error al cargar las notas.'})  
+    })
+})
+
+
+
 
 
 
@@ -78,14 +123,6 @@ router.get('/pagina', auth.isAuth, (req, res) => {
     })
 })
 
-router.post('/pagina/crear', auth.isAuth, (req, res) => {
-    user.paginaCrear(req.body, sessionHelper.getIdFromSession(req)).then((result) => {
-        res.json({status: 200, message: 'Página creada.'})
-    }).catch(err => {
-        console.log(err)
-        res.json({status: 500, message: 'Error al crear la página.'})
-    })
-})
 
 router.get('/pagina/:id', auth.isAuth, (req, res) => {
     user.paginaDespliegue(req.params.id).then((data) => {

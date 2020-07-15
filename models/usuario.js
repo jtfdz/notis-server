@@ -5,6 +5,28 @@ let sessionHelper = require('../models/session');
 const config = require('./config');
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 module.exports.registrarUsuario = async (data) => {
     try{
         const result = await db.result(config.q1, [data.username, bcrypt.hashSync(data.passwords.password, 10), data.nombre, sessionHelper.getCurrentTime(), data.email] );
@@ -41,25 +63,51 @@ module.exports.getUserById = async (id) => {
     }
 }
 
+
 module.exports.comparePassword = async (candidatePassword, hash) => {
     return bcrypt.compare(candidatePassword, hash);
 }
 
 
-
-
-
-
-
-
-module.exports.Despliegue = async (id) => {
+module.exports.notaCrear = async (data,id) => {
     try{
-        const result = await db.any('SELECT * FROM pagina WHERE id_usuario = $1', [id])
+        const result = await db.none(config.q5 , [id, data.tipo, data.contenido, sessionHelper.getCurrentTime(), data.titulo])
+        return result
+    }catch(e){
+        throw e;
+    }
+}
+
+module.exports.notasMostrar = async (id) => {
+    try{
+        const result = await db.any(config.q6, [id])
         return result;
     }catch(err){
         throw err
     }
 }
+
+module.exports.estadisticas = async (id) => {
+    try{
+        const data = [];
+        data[0] = await db.any(config.q7, [id]);
+        data[1] = await db.any(config.q8, [id]); 
+        data[2] = await db.any(config.q9, [id]);        
+        return data;
+    }catch(err){
+        throw err
+    }
+}
+
+
+
+
+
+
+
+
+
+
 
 
 module.exports.postDespliegue = async (id,pid) => {
@@ -72,14 +120,7 @@ module.exports.postDespliegue = async (id,pid) => {
 }
 
 
-module.exports.postCrear = async (data,id) => {
-    try{
-        const result = await db.none('INSERT INTO post (id_post,titulo_post,contenido_post,fecha_post,id_pw,imagen_post) VALUES (default, $1, $2, $3, $4, $5)' , [data.titulo,data.contenido,sessionHelper.getCurrentTime(),id,data.imagen])
-        return result
-    }catch(e){
-        throw e;
-    }
-}
+
 
 module.exports.postModificar = async (data,id) => {
     try {

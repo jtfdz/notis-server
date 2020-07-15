@@ -29,7 +29,7 @@ app.use(session({
   resave: true,
   cookie: {
     secure: false,
-    maxAge: 3600000
+    maxAge: 993600000
   }
 }));
 
