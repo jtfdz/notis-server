@@ -15,18 +15,6 @@ const config = require('./config');
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 module.exports.registrarUsuario = async (data) => {
     try{
         const result = await db.result(config.q1, [data.username, bcrypt.hashSync(data.passwords.password, 10), data.nombre, sessionHelper.getCurrentTime(), data.email] );
@@ -100,24 +88,34 @@ module.exports.estadisticas = async (id) => {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-module.exports.postDespliegue = async (id,pid) => {
+module.exports.notaBorrar = async (data, id) => {
     try{
-        const data = await db.any('SELECT * FROM post WHERE id_pw = $1 AND id_post = $2', [id,pid])
+        const result = await db.none(config.q10, [data, id])
+        return result
+    }catch(e){
+        throw e;
+    }
+}
+
+module.exports.notaMostrar = async (id) => {
+    try{
+        const data = await db.any(config.q11, [id])
         return data;
     }catch(err){
         throw err
     }
 }
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -131,15 +129,6 @@ module.exports.postModificar = async (data,id) => {
     }
 }
 
-
-module.exports.postBorrar = async (data) => {
-    try{
-        const result = await db.none('DELETE FROM post WHERE id_pagina = $1 ', [data.id_pagina])
-        return result
-    }catch(e){
-        throw e;
-    }
-}
 
 
 

@@ -35,25 +35,25 @@ router.post('/registro',
         let status, mensaje;
         if(count > 0){
             status = 200;
-            mensaje = "Usuario Registrado.";
+            mensaje = "Usuario Registrado :).";
         }else{
           status = 500;
-          mensaje = 'Error al registrar Usuario.'
+          mensaje = 'Error al registrar Usuario :(.'
           }
       res.json({status, mensaje})
       }).catch(err => {
         console.log(err);
-        res.status(500).json({status: 500, mensaje: 'Error al Registrar.'});
+        res.status(500).json({status: 500, mensaje: 'Error al Registrar :(.'});
         }) 
 });
 
 
 router.post('/nota/crear', auth.isAuth, (req, res) => {
     user.notaCrear(req.body, sessionHelper.getIdFromSession(req)).then((result) => {
-        res.json({status: 200, message: 'Nota creada.'})
+        res.json({status: 200, message: 'Nota creada :).'})
     }).catch(err => {
         console.log(err)
-        res.json({status: 500, message: 'Error al crear nota.'})
+        res.json({status: 500, message: 'Error al crear nota :(.'})
     })
 })
 
@@ -93,8 +93,31 @@ router.get('/notas', auth.isAuth, (req, res) => {
 })
 
 
+router.delete('/notas/:id/borrar', auth.isAuth, (req, res) => {
+    user.notaBorrar(req.params.id, sessionHelper.getIdFromSession(req)).then((result) => {
+        res.json({status: 200, message: 'Nota borrada :).'})
+    }).catch(err => {
+        console.log(err)
+        res.json({status: 500, message: 'Error al borrar nota :(.'})
+    })
+})
 
-
+router.get('/nota/:id', auth.isAuth, (req, res) => {
+    user.notaMostrar(req.params.id).then((data) => {
+        let message, status;
+        if(data !== null){
+            message = "Nota desplegada :).";
+            status = 200;
+        }else{
+            message = "Nota inexistente :(.",
+            status = 404;
+        }
+        res.json({data, message, status});
+    }).catch(err => {
+        console.log(err)
+        res.json({status: 500, message: 'Error'})  
+    })
+})
 
 
 
@@ -124,22 +147,7 @@ router.get('/pagina', auth.isAuth, (req, res) => {
 })
 
 
-router.get('/pagina/:id', auth.isAuth, (req, res) => {
-    user.paginaDespliegue(req.params.id).then((data) => {
-        let message, status;
-        if(data !== null){
-            message = "Pagina desplegada :).";
-            status = 200;
-        }else{
-            message = "Pagina inexistente :(.",
-            status = 404;
-        }
-        res.json({data, message, status});
-    }).catch(err => {
-        console.log(err)
-        res.json({status: 500, message: 'Error'})  
-    })
-})
+
 
 
 
@@ -152,67 +160,7 @@ router.put('/pagina/:id/editar', auth.isAuth, (req, res) => {
     })
 })
 
-router.delete('/pagina/:id/delete', auth.isAuth, (req, res) => {
-    user.paginaBorrar(req.params.id,sessionHelper.getIdFromSession(req)).then((result) => {
-        res.json({status: 200, message: 'Página borrada.'})
-    }).catch(err => {
-        console.log(err)
-        res.json({status: 500, message: 'Error al borrar página.'})
-    })
-})
 
-
-router.post('/pagina/:id/crear', auth.isAuth, (req, res) => {
-    user.postCrear(req.body, req.params.id).then((result) => {
-        res.json({status:200, message:'Post creado.'})
-    }).catch(err => {
-        console.log(err)
-        res.json({status: 500, message: 'Error al crear post.'})
-    })
-})
-
-router.get('/pagina/:id/post/:pid', auth.isAuth, (req, res) => {
-    user.postDespliegue(req.params.id,req.params.pid).then((data) => {
-        if(data !== null){
-            message = "Post desplegado :).";
-            status = 200;
-        }else{
-            message = "Post inexistente :(.",
-            status = 404;
-        }
-        res.json({data, message, status});
-    }).catch(err => {
-        
-        res.json({status: 500, message: 'Error en despliegue del post.'})
-    })
-})
-
-router.put('/pagina/:id/post/:id2', auth.isAuth, (req, res) => {
-    user.postModificar(req.body,req.params.id,req.params.id2,sessionHelper.getIdFromSession(req)).then((result) => {
-        res.json({status:200, message:'Post modificado.'})
-    }).catch(err => {
-        
-        res.json({status: 500, message: 'Error en modificación del post.'})
-    })
-})
-
-
-router.delete('/pagina/:id/post/:id2/eliminar', auth.isAuth, (req, res) => {
-    user.postBorrar(req.params.id,req.params.id2,sessionHelper.getIdFromSession(req)).then((result) => {
-        res.json({status:200, message:'Post borrado.'})
-    }).catch(err => {
-        
-        res.json({status: 500, message: 'Error en eliminar el post.'})
-    })
-})
-
-
-
-router.get('/feed', auth.isAuth, (req, res) => {
-    user.feed().then(result => {
-        res.json({status: 200, data: result})
-    })
-})
 
 
 module.exports = router;
